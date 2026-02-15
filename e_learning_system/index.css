@@ -1,0 +1,266 @@
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #f8f9fa, #ffecec);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.5s ease-in-out;
+}
+
+/* Sidebar Navigation */
+nav {
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+nav h3 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    animation: fadeIn 1s ease-in-out;
+    text-transform: uppercase;
+}
+
+/* Sidebar Links */
+.nav-link {
+    color: #fff;
+    padding: 12px 20px;
+    margin: 5px 0;
+    text-decoration: none;
+    display: block;
+    width: 90%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(10px);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Main Content Area */
+.container {
+    margin-left: 260px;
+    padding: 40px;
+    width: calc(100% - 260px);
+    animation: slideIn 0.5s ease-in-out forwards;
+}
+
+/* Welcome Text */
+h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #444;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Course Cards */
+.course-list div {
+    background: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.course-list div:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgb(1, 32, 63);
+}
+
+/* Remove underline & style the link inside */
+.course-list div a {
+    text-decoration: none;
+    color: #060f07;
+    font-weight: bold;
+    display: block;
+}
+
+
+/* Buttons */
+button {
+    background: #2575fc;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+button:hover {
+    background: #6a11cb;
+    transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) { /* Tablets */
+    nav {
+        width: 200px;
+    }
+    .container {
+        margin-left: 210px;
+        width: calc(100% - 210px);
+    }
+}
+
+@media (max-width: 768px) { /* Small Tablets & Phones */
+    nav {
+        width: 180px;
+    }
+    .container {
+        margin-left: 190px;
+        width: calc(100% - 190px);
+    }
+}
+
+@media (max-width: 576px) { /* Mobile Devices */
+    nav {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 10px 0;
+        text-align: center;
+    }
+    .nav-item {
+        display: inline-block;
+        margin: 5px;
+    }
+    .nav-link {
+        display: inline-block;
+        padding: 8px 12px;
+    }
+    .container {
+        margin-left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+}
+/* ----------------------------------- */
+.main-content {
+    margin-left: 260px;
+    padding: 30px;
+    background: #f0f4f8;
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.welcome-box {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    margin-bottom: 40px;
+    text-align: center;
+    animation: slideIn 1s ease-in-out;
+}
+
+.welcome-box h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.welcome-box p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.feature-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    width: 260px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.card p {
+    color: #666;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

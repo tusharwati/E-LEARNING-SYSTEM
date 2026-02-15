@@ -1,0 +1,129 @@
+/* General Styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Form Styling */
+fieldset {
+    width: 100%; 
+    max-width: 320px;
+    border: 1px solid rgb(254, 255, 242); 
+    border-radius: 12px;
+    padding: 50px;
+    background-color: rgb(254, 255, 242);
+    text-align: center;
+}
+
+legend {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: rgb(6, 0, 39);
+    padding: 5px 10px;
+    border-radius: 400px;
+    background-color: white;
+}
+
+/* Input Fields */
+.input-container {
+    position: relative;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+input {
+    width: 95%;
+    padding: 6px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: transparent;
+}
+
+input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Labels */
+label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #888;
+    transition: 0.3s;
+    pointer-events: none;
+    background: rgb(254, 255, 242);
+    padding: 0 4px;
+}
+
+input:focus + label,
+input:valid + label {
+    top: 0;
+    font-size: 11px;
+    color: #007bff;
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    font-size: 11px;
+    margin-top: 3px;
+    display: none;
+}
+
+/* Buttons */
+button {
+    background-color: rgb(53, 41, 129); 
+    color: white;
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out; 
+    width: 50%;
+}
+
+button:hover {
+    background-color: rgb(174, 167, 255);
+    transform: scale(1.05);
+}
+
+button:active { 
+    background-color: rgb(185, 208, 255);
+    transform: scale(0.95);
+}
+
+/* ---------------------index page----------------------------- */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: #333;
+    color: white;
+    padding: 20px;
+    position: fixed;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+.content {
+    margin-left: 260px;
+    padding: 20px;
+}
