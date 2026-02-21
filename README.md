@@ -43,7 +43,7 @@ Tools:
 
 How to Run the Project :
   Clone the repository
-  git clone https://github.com/your-username/e-learning-system.git
+  git clone https://github.com/tusharwati/E-LEARNING-SYSTEM/tree/main
   Move the project to the htdocs folder (XAMPP)
   Import the database file (elearning.sql) into MySQL
   Start Apache and MySQL
