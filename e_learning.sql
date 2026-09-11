@@ -32,7 +32,7 @@ CREATE TABLE `courses` (
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `thumbnail` varchar(255) DEFAULT 'default.jpg'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATEutf8mb4_unicode_ci; --utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `courses`
