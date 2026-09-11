@@ -45,21 +45,21 @@ $result = $conn->query($sql);
         <!-- Main Content -->
 <div class="main-content" id="content">
     <div class="welcome-box">
-        <h2>👋🏻 Welcome, <?= htmlspecialchars($user['name']) ?>!</h2>
-        <p>All courses are 100% free. 🚀 Start learning and level up your skills today!</p>
+        <h2> Welcome, <?= htmlspecialchars($user['name']) ?>!</h2>
+        <p>All courses are 100% free.  Start learning and level up your skills today!</p>
     </div>
 
     <div class="feature-cards">
         <div class="card" onclick="loadContent('courses')">
-            <h3>👨🏽‍💻 Courses</h3>
+            <h3> Courses</h3>
             <p>Browse all available learning resources</p>
         </div>
         <div class="card" onclick="loadContent('quiz_list')">
-            <h3>📝 Quiz</h3>
+            <h3> Quiz</h3>
             <p>Test your knowledge with exciting quizzes</p>
         </div>
         <div class="card" onclick="window.location.href='profile.php'">
-            <h3>👤 Profile</h3>
+            <h3> Profile</h3>
             <p>Update your personal information</p>
         </div>
     </div>
