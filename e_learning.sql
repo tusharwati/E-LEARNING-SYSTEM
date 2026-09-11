@@ -28,11 +28,43 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `courses` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
-  `thumbnail` varchar(255) DEFAULT 'default.jpg'
+  `thumbnail` varchar(255) DEFAULT 'default.jpg',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE = utf8mb4_unicode_ci; --utf8mb4_0900_ai_ci;
+
+CREATE TABLE `categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categories_slug_unique` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `categories` (`id`, `name`, `slug`) VALUES
+(1, 'Web development', 'web-development'),
+(2, 'Programming', 'programming'),
+(3, 'Interview preparation', 'interview-preparation');
+
+CREATE TABLE `modules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `position` int NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `modules_course_idx` (`course_id`),
+  CONSTRAINT `modules_course_fk` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `course_categories` (
+  `course_id` int NOT NULL,
+  `category_id` int NOT NULL,
+  PRIMARY KEY (`course_id`,`category_id`),
+  CONSTRAINT `course_categories_course_fk` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `course_categories_category_fk` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `courses`
@@ -44,6 +76,9 @@ INSERT INTO `courses` (`id`, `title`, `description`, `thumbnail`) VALUES
 (3, 'Pthon Basics', 'Start coding in python', 'python.jpg'),
 (4, 'Core Java', 'Java Tutorial for Beginners', 'java.jpg');
 
+INSERT INTO `course_categories` (`course_id`, `category_id`) VALUES
+(1, 1), (2, 2), (3, 2), (4, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -51,13 +86,17 @@ INSERT INTO `courses` (`id`, `title`, `description`, `thumbnail`) VALUES
 --
 
 CREATE TABLE `lessons` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `course_id` int NOT NULL,
+  `module_id` int DEFAULT NULL,
   `title` varchar(255) NOT NULL,
+  `position` int NOT NULL DEFAULT 1,
   `content` text NOT NULL,
   `video_url` varchar(255) NOT NULL,
-  `file_path` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `file_path` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `lessons_course_idx` (`course_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `lessons`
@@ -76,6 +115,14 @@ INSERT INTO `lessons` (`id`, `course_id`, `title`, `content`, `video_url`, `file
 (10, 3, 'Python in oneshot', 'Learn Python', 'https://www.youtube.com/embed/ERCMXc8x7mc', 'notes\\python\\Python_Complete_Notes.pdf'),
 (11, 4, 'Core java', 'Java Tutorial for Beginners', 'https://www.youtube.com/embed/UmnCZ7-9yDY', 'notes\\java\\Javanotes.pdf');
 
+INSERT INTO `modules` (`id`, `course_id`, `title`, `position`) VALUES
+(1, 1, 'Course lessons', 1),
+(2, 2, 'Course lessons', 1),
+(3, 3, 'Course lessons', 1),
+(4, 4, 'Course lessons', 1);
+
+UPDATE `lessons` SET `module_id` = `course_id`, `position` = `id`;
+
 -- --------------------------------------------------------
 
 --
@@ -87,7 +134,140 @@ CREATE TABLE `quizzes` (
   `course_id` int NOT NULL,
   `question` text NOT NULL,
   `answer` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `quiz_questions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `legacy_quiz_id` int DEFAULT NULL,
+  `question` text NOT NULL,
+  `explanation` text DEFAULT NULL,
+  `topic` varchar(100) DEFAULT NULL,
+  `position` int NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `quiz_questions_legacy_unique` (`legacy_quiz_id`),
+  KEY `quiz_questions_course_idx` (`course_id`),
+  CONSTRAINT `quiz_questions_course_fk` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `quiz_options` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question_id` int NOT NULL,
+  `option_text` varchar(500) NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT 0,
+  `position` int NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `quiz_options_question_idx` (`question_id`),
+  CONSTRAINT `quiz_options_question_fk` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `quiz_attempts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `course_id` int NOT NULL,
+  `score` int NOT NULL DEFAULT 0,
+  `total_questions` int NOT NULL DEFAULT 0,
+  `submitted_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `quiz_attempts_user_idx` (`user_id`,`submitted_at`),
+  CONSTRAINT `quiz_attempts_course_fk` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `quiz_attempt_answers` (
+  `attempt_id` int NOT NULL,
+  `question_id` int NOT NULL,
+  `selected_option_id` int DEFAULT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`attempt_id`,`question_id`),
+  CONSTRAINT `quiz_attempt_answers_attempt_fk` FOREIGN KEY (`attempt_id`) REFERENCES `quiz_attempts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `quiz_attempt_answers_question_fk` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `quiz_attempt_answers_option_fk` FOREIGN KEY (`selected_option_id`) REFERENCES `quiz_options` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `practice_topics` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `practice_topics_slug_unique` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `practice_problems` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `topic_id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `difficulty` enum('Easy','Medium','Hard') NOT NULL DEFAULT 'Easy',
+  `statement` text NOT NULL,
+  `examples` text DEFAULT NULL,
+  `constraints_text` text DEFAULT NULL,
+  `hint` text DEFAULT NULL,
+  `editorial` text DEFAULT NULL,
+  `expected_answer` varchar(500) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `practice_problems_topic_idx` (`topic_id`),
+  CONSTRAINT `practice_problems_topic_fk` FOREIGN KEY (`topic_id`) REFERENCES `practice_topics` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `practice_tags` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `practice_tags_slug_unique` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `practice_problem_tags` (
+  `problem_id` int NOT NULL,
+  `tag_id` int NOT NULL,
+  PRIMARY KEY (`problem_id`,`tag_id`),
+  CONSTRAINT `practice_problem_tags_problem_fk` FOREIGN KEY (`problem_id`) REFERENCES `practice_problems` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `practice_problem_tags_tag_fk` FOREIGN KEY (`tag_id`) REFERENCES `practice_tags` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `practice_submissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `answer_text` text NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT 0,
+  `submitted_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `practice_submissions_user_idx` (`user_id`,`problem_id`,`submitted_at`),
+  CONSTRAINT `practice_submissions_problem_fk` FOREIGN KEY (`problem_id`) REFERENCES `practice_problems` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `practice_topics` (`id`, `name`, `slug`) VALUES
+(1, 'Arrays', 'arrays'),
+(2, 'Strings', 'strings'),
+(3, 'SQL', 'sql'),
+(4, 'Interview fundamentals', 'interview-fundamentals');
+
+INSERT INTO `practice_problems`
+  (`id`, `topic_id`, `title`, `difficulty`, `statement`, `examples`, `constraints_text`, `hint`, `editorial`, `expected_answer`)
+VALUES
+(1, 1, 'Find the largest value', 'Easy',
+ 'Given the numbers 4, 9, 2, and 7, submit the largest value.',
+ 'Example: 4, 9, 2, 7 -> 9',
+ 'Use a single pass while tracking the current maximum.',
+ 'Keep the largest value seen so far.',
+ 'Compare each value with the current maximum and keep the larger value.',
+ '9'),
+(2, 3, 'Count SQL rows', 'Easy',
+ 'Which SQL aggregate function returns the number of rows in a result set?',
+ 'Example answer: COUNT',
+ 'Think about aggregate functions used with SELECT.',
+ 'Use COUNT(*) when you need the total number of rows.',
+ 'COUNT returns the number of rows or non-null values depending on the expression.',
+ 'COUNT');
+
+INSERT INTO `practice_tags` (`id`, `name`, `slug`) VALUES
+(1, 'Arrays', 'arrays'),
+(2, 'Strings', 'strings'),
+(3, 'SQL', 'sql'),
+(4, 'Beginner', 'beginner');
+
+INSERT INTO `practice_problem_tags` (`problem_id`, `tag_id`) VALUES
+(1, 1), (1, 4), (2, 3), (2, 4);
 
 --
 -- Dumping data for table `quizzes`
@@ -135,6 +315,19 @@ INSERT INTO `quizzes` (`id`, `course_id`, `question`, `answer`) VALUES
 (39, 4, 'What keyword is used to handle exceptions?', 'try'),
 (40, 4, 'Which keyword creates an object in Java?', 'new');
 
+INSERT INTO `quiz_questions` (`id`, `course_id`, `legacy_quiz_id`, `question`, `explanation`, `topic`, `position`)
+SELECT `id`, `course_id`, `id`, `question`, CONCAT('Review the course material for: ', `question`), 'Core concepts', `id`
+FROM `quizzes`;
+
+INSERT INTO `quiz_options` (`question_id`, `option_text`, `is_correct`, `position`)
+SELECT `id`, `answer`, 1, 1 FROM `quizzes`;
+
+INSERT INTO `quiz_options` (`question_id`, `option_text`, `is_correct`, `position`)
+SELECT `id`, CONCAT('Not ', LEFT(answer, 120)), 0, 2 FROM `quizzes`;
+
+INSERT INTO `quiz_options` (`question_id`, `option_text`, `is_correct`, `position`)
+SELECT `id`, 'None of the above', 0, 3 FROM `quizzes`;
+
 -- --------------------------------------------------------
 
 --
@@ -142,11 +335,32 @@ INSERT INTO `quizzes` (`id`, `course_id`, `question`, `answer`) VALUES
 --
 
 CREATE TABLE `users` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `password` varchar(255) DEFAULT NULL,
+  `role` enum('student','admin') NOT NULL DEFAULT 'student',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `course_enrollments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `course_id` int NOT NULL,
+  `enrolled_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `course_enrollment_unique` (`user_id`,`course_id`),
+  CONSTRAINT `enrollments_course_fk` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `lesson_progress` (
+  `user_id` int NOT NULL,
+  `lesson_id` int NOT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`lesson_id`),
+  CONSTRAINT `lesson_progress_lesson_fk` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
@@ -160,6 +374,94 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`) VALUES
 (14, 'sundar Madavi', 'sundar@gmail.com', 'Sundar@123'),
 (16, 'Tushar Watti', 'tushar@gmail.com', 'Tushar@123');
 
+CREATE TABLE `daily_challenges` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `challenge_date` date NOT NULL,
+  `question` text NOT NULL,
+  `explanation` text NOT NULL,
+  `xp_reward` int NOT NULL DEFAULT 20,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `daily_challenges_date_unique` (`challenge_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `daily_challenge_options` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `challenge_id` int NOT NULL,
+  `option_text` varchar(500) NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT 0,
+  `position` int NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `daily_challenge_options_challenge_idx` (`challenge_id`),
+  CONSTRAINT `daily_challenge_options_challenge_fk` FOREIGN KEY (`challenge_id`) REFERENCES `daily_challenges` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `daily_challenge_attempts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `challenge_id` int NOT NULL,
+  `selected_option_id` int DEFAULT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT 0,
+  `xp_awarded` int NOT NULL DEFAULT 0,
+  `completed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `daily_challenge_attempt_unique` (`user_id`,`challenge_id`),
+  KEY `daily_challenge_attempts_user_idx` (`user_id`,`completed_at`),
+  CONSTRAINT `daily_challenge_attempts_challenge_fk` FOREIGN KEY (`challenge_id`) REFERENCES `daily_challenges` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `daily_challenge_attempts_option_fk` FOREIGN KEY (`selected_option_id`) REFERENCES `daily_challenge_options` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `xp_transactions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `source_type` varchar(50) NOT NULL,
+  `source_id` int NOT NULL,
+  `amount` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `xp_transaction_source_unique` (`user_id`,`source_type`,`source_id`),
+  KEY `xp_transactions_user_idx` (`user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `user_learning_stats` (
+  `user_id` int NOT NULL,
+  `total_xp` int NOT NULL DEFAULT 0,
+  `level` int NOT NULL DEFAULT 1,
+  `current_streak` int NOT NULL DEFAULT 0,
+  `longest_streak` int NOT NULL DEFAULT 0,
+  `last_challenge_date` date DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `daily_challenges` (`challenge_date`, `question`, `explanation`, `xp_reward`)
+VALUES (CURRENT_DATE, 'Which data structure follows the first-in, first-out (FIFO) principle?', 'A queue removes items in the same order in which they were added, which is FIFO.', 20);
+
+SET @daily_challenge_id = (SELECT id FROM daily_challenges WHERE challenge_date = CURRENT_DATE);
+INSERT INTO `daily_challenge_options` (`challenge_id`, `option_text`, `is_correct`, `position`) VALUES
+(@daily_challenge_id, 'Queue', 1, 1),
+(@daily_challenge_id, 'Stack', 0, 2),
+(@daily_challenge_id, 'Tree', 0, 3);
+
+ALTER TABLE `course_enrollments`
+  ADD CONSTRAINT `enrollments_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `lesson_progress`
+  ADD CONSTRAINT `lesson_progress_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `quiz_attempts`
+  ADD CONSTRAINT `quiz_attempts_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `practice_submissions`
+  ADD CONSTRAINT `practice_submissions_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `daily_challenge_attempts`
+  ADD CONSTRAINT `daily_challenge_attempts_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `xp_transactions`
+  ADD CONSTRAINT `xp_transactions_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `user_learning_stats`
+  ADD CONSTRAINT `user_learning_stats_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
 --
 -- Indexes for dumped tables
 --
@@ -168,14 +470,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`) VALUES
 -- Indexes for table `courses`
 --
 ALTER TABLE `courses`
-  ADD PRIMARY KEY (`id`);
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Indexes for table `lessons`
 --
 ALTER TABLE `lessons`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `course_id` (`course_id`);
+  MODIFY `id` int NOT NULL AUTO_INCREMENT,
+  ADD KEY `lessons_module_idx` (`module_id`);
 
 --
 -- Indexes for table `quizzes`
@@ -188,8 +490,7 @@ ALTER TABLE `quizzes`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -228,6 +529,9 @@ ALTER TABLE `users`
 --
 ALTER TABLE `lessons`
   ADD CONSTRAINT `lessons_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `lessons`
+  ADD CONSTRAINT `lessons_module_fk` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `quizzes`

@@ -12,18 +12,20 @@ The system allows users to explore courses, watch learning content, download stu
   Help students learn at their own pace
   Encourage self-learning and skill development
 
-✨ Key Features
+Key Features
 
-1.Free courses (no payment required)
-2.User registration & login
-3.Video-based learning
-4.Downloadable notes / PDFs
-5.Easy course navigation
-6.Quizes for diffrent all technologies
+1. Free courses (no payment required)
+2. Public course browsing with protected learning actions
+3. User registration and secure login
+4. Video-based lessons and downloadable notes / PDFs
+5. Course enrollment and lesson progress
+6. Normalized MCQ quizzes with attempt history
+7. Practice problems with safe, non-executing answer checks
+8. Daily challenges, XP, levels, streaks, and leaderboard
+9. Rule-based personalized topic and practice recommendations
 
-📱 Responsive design (mobile & desktop)
-🔐 Secure authentication system
-📊 Admin panel to manage courses (optional)
+Responsive design for mobile and desktop
+Secure authentication, password hashing, sessions, and CSRF protection
 
 🛠️ Technologies Used
 Frontend :
@@ -43,12 +45,16 @@ Tools:
 
 How to Run the Project :
   Clone the repository
-  git clone https://github.com/tusharwati/E-LEARNING-SYSTEM/tree/main
-  Move the project to the htdocs folder (XAMPP)
-  Import the database file (elearning.sql) into MySQL
-  Start Apache and MySQL
-  Open browser and visit
-  http://localhost/e-learning-system
+  git clone https://github.com/tusharwati/E-LEARNING-SYSTEM.git
+  Move the project folder to the htdocs folder (XAMPP)
+  Import e_learning.sql into MySQL as the e_learning database. The dump is compatible with the XAMPP MySQL version used by this project.
+  The included configuration uses the default XAMPP root account without a password.
+  If your MySQL root account has a password, update $password in e_learning_system/db_config.php
+  Start Apache and MySQL from the XAMPP Control Panel
+  Open the application folder in your browser:
+  http://localhost/E-LEARNING-SYSTEM/e_learning_system/
+
+Visitors can browse the homepage, course catalog, course previews, and preparation categories without an account. Signup or login is requested only when starting a lesson, attempting a quiz, or opening the dashboard/profile. After authentication, the visitor is returned to the page they originally requested.
 OUTPUTS :
 <img width="917" height="581" alt="Screenshot (208)" src="https://github.com/user-attachments/assets/e53b4cf0-0ae4-4fee-a142-1176975f8c8c" />
 <img width="1327" height="604" alt="Screenshot (209)" src="https://github.com/user-attachments/assets/dc8894a0-6eb3-4b5b-a942-cb033c58adc9" />
@@ -63,18 +69,13 @@ Student :
   3.Watch videos
   4.Download notes
 
-Admin (Optional) :
-  Add / update courses
-  Upload videos and notes
-  Manage users
+Admin role groundwork is present in the schema. The admin management interface is planned for a later phase.
   
-📌 Future Enhancements
+Future Enhancements
 
+Admin dashboard for managing learning content
 Certificate generation
-Quiz & assessments
-Progress tracking
 Discussion forum
-AI-based course recommendations
 
 ❤️ Why Free Courses?
 

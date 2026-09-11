@@ -1,78 +1,64 @@
 <?php
-session_start();
-include 'db_config.php';
+include __DIR__ . '/auth.php';
+start_secure_session();
+include __DIR__ . '/db_config.php';
+include __DIR__ . '/layout.php';
 
-// Redirect to login if the user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// Fetch user details
-$user_id = $_SESSION['user_id'];
-$sql_user = "SELECT name FROM users WHERE id = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("i", $user_id);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$user = $result_user->fetch_assoc();
-
-// Fetch free courses
-$sql = "SELECT * FROM courses";
-$result = $conn->query($sql);
+$result = $conn->query("SELECT * FROM courses ORDER BY id DESC");
+$category_result = $conn->query("SELECT name, slug FROM categories ORDER BY name");
+render_header('Explore courses');
 ?>
-
-<html>
-<head>
-    <title>Dashboard | E-Learning</title>
-    <link rel="stylesheet" href="index.css?v=<?php echo time(); ?>"> <!-- Custom CSS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
+<section class="hero">
     <div>
-        <!-- Sidebar -->
-        <nav>
-            <h3 class="text-center">E-Learning</h3>
-            <ul>
-                <a class="nav-link" href="index.php" onclick="loadContent('home')">🏠︎ Home</a>
-                <a class="nav-link" href="profile.php">👤 Profile</a>
-                <a class="nav-link" href="#courses.php" onclick="loadContent('courses')">👨🏽‍💻 Courses</a>
-                <a class="nav-link" href="#quiz_list.php" onclick="loadContent('quiz_list')">💭Quiz</a>
-                <a class="nav-link" href="login.php">↪ Logout</a>
-            </ul>
-        </nav>
-        
-        <!-- Main Content -->
-<div class="main-content" id="content">
-    <div class="welcome-box">
-        <h2> Welcome, <?= htmlspecialchars($user['name']) ?>!</h2>
-        <p>All courses are 100% free.  Start learning and level up your skills today!</p>
+        <span class="eyebrow">Build skills that last</span>
+        <h1>Learn with structure, practice with purpose.</h1>
+        <p>Explore practical courses and learning resources designed to help you build confidence one lesson at a time.</p>
+        <form class="hero-search" action="courses.php" method="get">
+            <label class="sr-only" for="hero-search">Search courses, topics, and practice problems</label>
+            <input id="hero-search" type="search" name="q" placeholder="Search courses, topics, and practice problems">
+            <button class="button button-primary" type="submit">Search library</button>
+        </form>
+        <div class="actions"><a class="button button-secondary" href="#courses">Explore courses</a><a class="text-link" href="practice.php">Browse practice problems -&gt;</a></div>
     </div>
-
-    <div class="feature-cards">
-        <div class="card" onclick="loadContent('courses')">
-            <h3> Courses</h3>
-            <p>Browse all available learning resources</p>
-        </div>
-        <div class="card" onclick="loadContent('quiz_list')">
-            <h3> Quiz</h3>
-            <p>Test your knowledge with exciting quizzes</p>
-        </div>
-        <div class="card" onclick="window.location.href='profile.php'">
-            <h3> Profile</h3>
-            <p>Update your personal information</p>
-        </div>
+    <div class="hero-panel">
+        <span class="badge">Open learning library</span>
+        <strong><?= (int) $result->num_rows ?> courses</strong>
+        <span class="muted">Start browsing freely. Create an account when you are ready to learn.</span>
     </div>
-</div>
+</section>
 
+<section class="section-block">
+    <div class="section-heading"><div><span class="eyebrow">Learn by direction</span><h2>Find a path that fits your goals</h2></div></div>
+    <div class="category-grid">
+        <?php while ($category = $category_result->fetch_assoc()): ?>
+            <a class="category-card" href="courses.php?category=<?= urlencode($category['slug']) ?>"><span class="category-icon"><?= strtoupper(substr($category['name'], 0, 1)) ?></span><strong><?= htmlspecialchars($category['name']) ?></strong><span>Explore courses -&gt;</span></a>
+        <?php endwhile; ?>
     </div>
+</section>
 
-    <script>
-        function loadContent(page) {
-            $.get(page + ".php", function(data) {
-                $("#content").html(data);
-            });
-        }
-    </script>
-</body>
-</html> 
+<section id="courses">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Course catalog</span>
+            <h2>Choose your next topic</h2>
+        </div>
+        <a href="courses.php">View all</a>
+    </div>
+    <div class="course-grid">
+        <?php while ($course = $result->fetch_assoc()): ?>
+            <article class="course-card">
+                <img src="thumbnails/<?= htmlspecialchars(trim($course['thumbnail'] ?? 'default.jpg')) ?>" alt="<?= htmlspecialchars($course['title']) ?>">
+                <div class="course-card-body">
+                    <h3><?= htmlspecialchars($course['title']) ?></h3>
+                    <p><?= htmlspecialchars($course['description']) ?></p>
+                    <a class="button button-secondary" href="course_detail.php?id=<?= (int) $course['id'] ?>">View course</a>
+                </div>
+            </article>
+        <?php endwhile; ?>
+    </div>
+</section>
+<section class="feature-strip">
+    <div><span class="eyebrow">A better way to learn</span><h2>Learn, practise, and track real progress.</h2><p>Build a steady routine with structured lessons, focused quizzes, and practice that helps you remember.</p></div>
+    <div class="feature-points"><span><strong>01</strong> Structured learning paths</span><span><strong>02</strong> Practice with clear feedback</span><span><strong>03</strong> Progress that stays yours</span></div>
+</section>
+<?php render_footer(); ?>

@@ -1,210 +1,52 @@
 <?php
-include 'db_config.php';
-
-if (!isset($_GET['id'])) {
-    echo "Invalid Course ID";
-    exit;
+include __DIR__ . '/auth.php';
+start_secure_session();
+include __DIR__ . '/db_config.php';
+include __DIR__ . '/layout.php';
+$course_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$course_id || $course_id < 1) { http_response_code(400); exit('Invalid course.'); }
+$stmt = $conn->prepare("SELECT * FROM courses WHERE id = ?");
+$stmt->bind_param("i", $course_id);
+$stmt->execute();
+$course = $stmt->get_result()->fetch_assoc();
+if (!$course) { http_response_code(404); exit('Course not found.'); }
+$category_stmt = $conn->prepare("SELECT categories.name FROM categories JOIN course_categories ON course_categories.category_id = categories.id WHERE course_categories.course_id = ? ORDER BY categories.name");
+$category_stmt->bind_param("i", $course_id);
+$category_stmt->execute();
+$categories = $category_stmt->get_result();
+$lesson_stmt = $conn->prepare("SELECT lessons.id, lessons.title, modules.title AS module_title FROM lessons LEFT JOIN modules ON modules.id = lessons.module_id WHERE lessons.course_id = ? ORDER BY modules.position, lessons.position, lessons.id");
+$lesson_stmt->bind_param("i", $course_id);
+$lesson_stmt->execute();
+$lessons = $lesson_stmt->get_result();
+$first_stmt = $conn->prepare("SELECT id FROM lessons WHERE course_id = ? ORDER BY position, id LIMIT 1");
+$first_stmt->bind_param("i", $course_id);
+$first_stmt->execute();
+$first_row = $first_stmt->get_result()->fetch_assoc();
+$first_lesson_id = $first_row ? (int) $first_row['id'] : null;
+$enrolled = false;
+if (isset($_SESSION['user_id'])) {
+    $enroll_stmt = $conn->prepare("SELECT id FROM course_enrollments WHERE user_id = ? AND course_id = ?");
+    $enroll_stmt->bind_param("ii", $_SESSION['user_id'], $course_id);
+    $enroll_stmt->execute();
+    $enrolled = $enroll_stmt->get_result()->num_rows > 0;
 }
-
-$course_id = intval($_GET['id']);
-$sql = "SELECT * FROM courses WHERE id = $course_id";
-$result = $conn->query($sql);
-
-if ($result->num_rows == 0) {
-    echo "Course not found.";
-    exit;
-}
-
-$course = $result->fetch_assoc();
+render_header($course['title'], isset($_SESSION['user_id']) ? 'courses' : '');
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= htmlspecialchars($course['title']); ?> | Course Details</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-        /* Reset and Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg,hsl(245, 100.00%, 89.20%),rgb(6, 97, 255));
-            color: #fff;
-            padding-bottom: 80px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        /* Navbar */
-        nav {
-            background: rgba(254, 254, 254, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        nav .navbar-brand {
-            color:rgb(0, 0, 0);
-            font-size: 1.6rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        /* Container */
-        .container {
-            max-width: 900px;
-            margin: 60px auto;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 15px;
-            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
-            animation: slideIn 1s ease-in-out;
-        }
-
-        h2, h4 {
-            text-align: center;
-            font-weight: bold;
-            color: #ffcc00;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 18px;
-            line-height: 1.6;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        /* Lessons List */
-        .list-group {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-        }
-
-        .list-group-item {
-            background: rgba(255, 255, 255, 0.2);
-            margin-bottom: 12px;
-            border-radius: 10px;
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-
-        .list-group-item:hover {
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .list-group-item a {
-            display: block;
-            padding: 15px 20px;
-            text-decoration: none;
-            color:rgb(187, 254, 255);
-            font-weight: 600;
-            font-size: 17px;
-            transition: color 0.3s ease;
-        }
-
-        .list-group-item a:hover {
-            color:rgb(0, 251, 255);
-        }
-
-        /* Back Button */
-        .btn-secondary {
-            display: block;
-            width: fit-content;
-            margin: 30px auto 0;
-            padding: 10px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            background: #fff;
-            color: #333;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: background 0.3s ease, transform 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: #ddd;
-            transform: scale(1.1);
-        }
-
-        /* Footer */
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: hsl(0, 0.00%, 100.00%);
-            text-align: center;
-            padding: 15px;
-            color: #000;
-            font-weight: bold;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<!-- Navbar -->
-<nav>
-    <a href="index.php" class="navbar-brand">E-Learning System</a>
-</nav>
-
-<!-- Course Details -->
-<div class="container">
-    <h2><?= htmlspecialchars($course['title']); ?></h2>
-    <p><?= htmlspecialchars($course['description']); ?></p>
-
-    <h4>Course Lessons</h4>
-    <ul class="list-group">
-        <?php
-        $lesson_sql = "SELECT * FROM lessons WHERE course_id = $course_id";
-        $lesson_result = $conn->query($lesson_sql);
-        
-        if ($lesson_result->num_rows > 0) {
-            while ($lesson = $lesson_result->fetch_assoc()) {
-                echo '<li class="list-group-item">';
-                echo '<a href="lesson.php?id=' . $lesson['id'] . '">' . htmlspecialchars($lesson['title']) . '</a>';
-                echo '</li>';
-            }
-        } else {
-            echo '<li class="list-group-item"><a>No lessons available.</a></li>';
-        }
-        ?>
-    </ul>
-
-    <a href="index.php#courses.php" class="btn-secondary">← Back to Course</a>
+<div class="course-hero panel">
+    <div>
+        <div class="tag-row"><?php while ($category = $categories->fetch_assoc()): ?><span class="badge"><?= htmlspecialchars($category['name']) ?></span><?php endwhile; ?></div>
+        <h1><?= htmlspecialchars($course['title']) ?></h1>
+        <p class="lead"><?= htmlspecialchars($course['description']) ?></p>
+        <?php if ($enrolled): ?><p class="success-text">You are enrolled in this course.</p><?php endif; ?>
+        <div class="actions">
+            <?php if ($first_lesson_id !== null): $start_url = 'lesson.php?id=' . $first_lesson_id; ?><a class="button button-primary" href="<?= htmlspecialchars(isset($_SESSION['user_id']) ? $start_url : '#') ?>" <?= isset($_SESSION['user_id']) ? '' : 'data-auth-open data-return-to="' . htmlspecialchars($start_url) . '"' ?>>Start learning</a><?php endif; ?>
+            <?php if (isset($_SESSION['user_id']) && !$enrolled): ?><form action="enroll.php" method="post"><input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>"><input type="hidden" name="course_id" value="<?= $course_id ?>"><button class="button button-secondary" type="submit">Enroll in course</button></form><?php elseif (!isset($_SESSION['user_id'])): ?><a class="button button-secondary" href="#" data-auth-open data-return-to="course_detail.php?id=<?= $course_id ?>">Enroll in course</a><?php endif; ?>
+        </div>
+    </div>
+    <div class="course-hero-art"><span><?= strtoupper(substr($course['title'], 0, 1)) ?></span><small>Structured course</small></div>
 </div>
-
-<!-- Footer -->
-<footer>
-    &copy; 2025 E-Learning System | All Free Courses
-</footer>
-
-</body>
-</html>
+<section class="panel lesson-outline">
+    <div class="section-heading"><div><span class="eyebrow">Course outline</span><h2>Lessons and modules</h2></div><span class="muted">Preview the curriculum</span></div>
+    <?php $current_module = null; while ($lesson = $lessons->fetch_assoc()): if ($current_module !== $lesson['module_title']): $current_module = $lesson['module_title']; ?><h3 class="module-heading"><?= htmlspecialchars($current_module ?: 'Lessons') ?></h3><?php endif; ?><a class="lesson-row" href="<?= htmlspecialchars(isset($_SESSION['user_id']) ? 'lesson.php?id=' . (int) $lesson['id'] : '#') ?>" <?= isset($_SESSION['user_id']) ? '' : 'data-auth-open data-return-to="lesson.php?id=' . (int) $lesson['id'] . '"' ?>><span class="lesson-number"><?= (int) $lesson['id'] ?></span><span><?= htmlspecialchars($lesson['title']) ?></span><span class="lesson-arrow">-&gt;</span></a><?php endwhile; ?>
+</section>
+<?php render_footer(); ?>
