@@ -1,15 +1,12 @@
 <?php
-session_start();
+include 'auth.php';
+start_secure_session();
 include 'db_config.php';
 
-// Redirect to login if the user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: auth/login.php");
-    exit();
-}
+require_login('edit_profile.php');
 
 $user_id = $_SESSION['user_id'];
-$sql_user = "SELECT name, email, password FROM users WHERE id = ?";
+$sql_user = "SELECT name, email FROM users WHERE id = ?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("i", $user_id);
 $stmt_user->execute();
@@ -18,21 +15,25 @@ $user = $result_user->fetch_assoc();
 
 $name = $user['name'];
 $email = $user['email'];
-$password = $user['password'];
+$password = '';
 $error_message = "";
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_valid_csrf();
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
-    $password = trim($_POST['password']); // Updated password field
+    $password = $_POST['password'] ?? '';
 
-    if (empty($name) || empty($email) || empty($password)) {
-        $error_message = "All fields are required.";
+    if ($name === '' || strlen($name) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = "Enter a valid name and email address.";
+    } elseif (!validate_password($password)) {
+        $error_message = "Password must be at least 8 characters and include uppercase, lowercase, and a number.";
     } else {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $update_sql = "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?";
         $stmt_update = $conn->prepare($update_sql);
-        $stmt_update->bind_param("sssi", $name, $email, $password, $user_id);
+        $stmt_update->bind_param("sssi", $name, $email, $password_hash, $user_id);
         
         if ($stmt_update->execute()) {
             header("Location: profile.php");
@@ -179,6 +180,7 @@ input:focus {
             <p class="error"><?= htmlspecialchars($error_message) ?></p>
         <?php endif; ?>
         <form action="edit_profile.php" method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
             <div class="form-group">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>" required>
@@ -189,7 +191,8 @@ input:focus {
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" value="<?= htmlspecialchars($password) ?>" required>
+                <input type="password" id="password" name="password" required
+                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
             </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
             <a href="profile.php" class="btn btn-secondary">Cancel</a>
