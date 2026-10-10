@@ -56,9 +56,11 @@ How to Run the Project :
 
 Visitors can browse the homepage, course catalog, course previews, and preparation categories without an account. Signup or login is requested only when starting a lesson, attempting a quiz, or opening the dashboard/profile. After authentication, the visitor is returned to the page they originally requested.
 OUTPUTS :
+VERSION 1 :
 <img width="917" height="581" alt="Screenshot (208)" src="https://github.com/user-attachments/assets/e53b4cf0-0ae4-4fee-a142-1176975f8c8c" />
 
-
+VERSION 2 :
+<img width="400" height="497" alt="e_learning_version_2" src="https://github.com/user-attachments/assets/49ceb15b-6120-4ba6-b509-6733b163b566" />
 👥 User Roles
 Student :
   1.Register & login
@@ -81,6 +83,3 @@ This project focuses on learning without financial barriers, helping students gr
 
 📜 License
 This project is open-source and free to use for educational purposes.
-
-<img width="400" height="497" alt="e_learning_version_2" src="https://github.com/user-attachments/assets/49ceb15b-6120-4ba6-b509-6733b163b566" />
-
