@@ -6,7 +6,7 @@ The goal of this project is to make quality education accessible to everyone wit
 
 The system allows users to explore courses, watch learning content, download study materials, they can give quizes also and improve their skills in an easy and user-friendly environment.
 
-🎯 Objectives
+Objectives
   Provide 100% free educational content
   Create a simple and attractive learning platform
   Help students learn at their own pace
@@ -64,25 +64,15 @@ VERSION 1 :
 
 VERSION 2 :
 <img width="400" height="497" alt="e_learning_version_2" src="https://github.com/user-attachments/assets/49ceb15b-6120-4ba6-b509-6733b163b566" />
-👥 User Roles
-Student :
-  1.Register & login
-  2.Browse free courses
-  3.Watch videos
-  4.Download notes
 
-Admin role groundwork is present in the schema. The admin management interface is planned for a later phase.
-  
+
 Future Enhancements
 
 Admin dashboard for managing learning content
 Certificate generation
 Discussion forum
 
-❤️ Why Free Courses?
+This project reflects my ongoing journey in building practical, learner-focused web applications. I’m excited to keep improving it!
 
-Education should be accessible to everyone.
-This project focuses on learning without financial barriers, helping students grow their knowledge and skills freely.
-
-📜 License
+License
 This project is open-source and free to use for educational purposes.
