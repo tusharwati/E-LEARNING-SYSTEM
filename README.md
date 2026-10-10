@@ -57,9 +57,6 @@ How to Run the Project :
 Visitors can browse the homepage, course catalog, course previews, and preparation categories without an account. Signup or login is requested only when starting a lesson, attempting a quiz, or opening the dashboard/profile. After authentication, the visitor is returned to the page they originally requested.
 OUTPUTS :
 <img width="917" height="581" alt="Screenshot (208)" src="https://github.com/user-attachments/assets/e53b4cf0-0ae4-4fee-a142-1176975f8c8c" />
-<img width="1327" height="604" alt="Screenshot (209)" src="https://github.com/user-attachments/assets/dc8894a0-6eb3-4b5b-a942-cb033c58adc9" />
-<img width="1344" height="599" alt="Screenshot (210)" src="https://github.com/user-attachments/assets/0dfd3d51-f094-45e5-821a-763aab9bb744" />
-<img width="1318" height="597" alt="Screenshot (211)" src="https://github.com/user-attachments/assets/6553b853-5864-4cbe-9014-2b45c8cb1e0b" />
 
 
 👥 User Roles
