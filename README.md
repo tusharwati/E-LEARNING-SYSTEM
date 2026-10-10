@@ -85,4 +85,4 @@ This project focuses on learning without financial barriers, helping students gr
 📜 License
 This project is open-source and free to use for educational purposes.
 
-![Project Demo](C:\xampp\htdocs\E-LEARNING-SYSTEM)
+![Project Demo]("C:\Users\tshar\Downloads\e_learning_version_2.gif")
