@@ -59,6 +59,9 @@ OUTPUTS :
 VERSION 1 :
 <img width="917" height="581" alt="Screenshot (208)" src="https://github.com/user-attachments/assets/e53b4cf0-0ae4-4fee-a142-1176975f8c8c" />
 
+
+
+
 VERSION 2 :
 <img width="400" height="497" alt="e_learning_version_2" src="https://github.com/user-attachments/assets/49ceb15b-6120-4ba6-b509-6733b163b566" />
 👥 User Roles
