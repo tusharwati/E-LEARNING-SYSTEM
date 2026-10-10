@@ -1,10 +1,8 @@
 E-Learning Platform (Free Courses Platform)
 Project Overview
+A full-stack, learner-centric E-Learning Platform to deliver accessible and structured digital education through a completely free learning model. The platform integrates course discovery, multimedia-based learning, assessment, progress tracking, gamification, and rule-based personalization into a unified learning ecosystem.
 
-This E-Learning System is a web-based platform designed to provide completely free online courses for learners.
-The goal of this project is to make quality education accessible to everyone without any paid subscriptions or hidden charges.
-
-The system allows users to explore courses, watch learning content, download study materials, they can give quizes also and improve their skills in an easy and user-friendly environment.
+The system is designed to provide a seamless learning workflow—from public course discovery and authenticated enrollment to lesson consumption, assessment, progress monitoring, and continuous skill development.
 
 Objectives
   Provide 100% free educational content
@@ -12,36 +10,17 @@ Objectives
   Help students learn at their own pace
   Encourage self-learning and skill development
 
-Key Features
-
-1. Free courses (no payment required)
-2. Public course browsing with protected learning actions
-3. User registration and secure login
-4. Video-based lessons and downloadable notes / PDFs
-5. Course enrollment and lesson progress
-6. Normalized MCQ quizzes with attempt history
-7. Practice problems with safe, non-executing answer checks
-8. Daily challenges, XP, levels, streaks, and leaderboard
-9. Rule-based personalized topic and practice recommendations
 
 Responsive design for mobile and desktop
 Secure authentication, password hashing, sessions, and CSRF protection
 
-🛠️ Technologies Used
-Frontend :
-  1.HTML
-  2.CSS
-  3.JavaScript
-  4.jQuery / AJAX
+Technology Stack
 
-Backend :
-  1.PHP
-  2.Database
-  3.MySQL
-
-Tools:
-  1.VS Code
-  2.XAMPP / WAMP
+Frontend: HTML5, CSS3, JavaScript, jQuery, AJAX
+Backend: PHP
+Database: MySQL
+Development Environment: XAMPP / WAMP
+Version Control: Git & GitHub
 
 How to Run the Project :
   Clone the repository
