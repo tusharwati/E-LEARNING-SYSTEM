@@ -85,4 +85,5 @@ This project focuses on learning without financial barriers, helping students gr
 📜 License
 This project is open-source and free to use for educational purposes.
 
-![Project Demo]("C:\Users\tshar\Downloads\e_learning_version_2.gif")
+![Project Demo]("C:\Users\tshar\Downloads\e_learning_version_2.gif")<img width="400" height="497" alt="e_learning_version_2" src="https://github.com/user-attachments/assets/49ceb15b-6120-4ba6-b509-6733b163b566" />
+
